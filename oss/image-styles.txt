@@ -1,0 +1,2 @@
+styleName:cover,styleBody:image/auto-orient,1/interlace,1/resize,m_fill,w_180,h_140/quality,q_90/format,jpg
+styleName:safe-check,styleBody:image/auto-orient,1/interlace,1/resize,m_pad,w_400,h_500/quality,q_90/format,jpg

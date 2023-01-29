@@ -1,0 +1,7 @@
+/mongodb/**
+/nginx/certificates/**
+/rabbitmq/**
+/.env
+!.gitkeep
+
+.DS_Store

@@ -1,0 +1,51 @@
+
+
+# http://(www.)example.com -> https://example.com
+server {
+    listen       80;
+    server_name  ${DOMAIN} www.${DOMAIN};
+    return 301   https://${DOMAIN}$request_uri;
+}
+
+# https://www.example.com -> https://example.com
+server {
+    listen       443 ssl;
+    server_name  www.${DOMAIN};
+    keepalive_timeout   70;
+
+    ssl_protocols       TLSv1 TLSv1.1 TLSv1.2;
+    ssl_ciphers         AES128-SHA:AES256-SHA:RC4-SHA:DES-CBC3-SHA:RC4-MD5;
+    ssl_certificate     /certificates/cert.pem;
+    ssl_certificate_key /certificates/cert.key;
+    ssl_session_cache   shared:SSL:10m;
+    ssl_session_timeout 10m;
+
+    return 301   https://${DOMAIN}$request_uri;
+}
+
+server {
+    listen       443 ssl;
+    server_name  ${DOMAIN};
+    keepalive_timeout   70;
+
+    ssl_protocols       TLSv1 TLSv1.1 TLSv1.2;
+    ssl_ciphers         AES128-SHA:AES256-SHA:RC4-SHA:DES-CBC3-SHA:RC4-MD5;
+    ssl_certificate     /certificates/cert.pem;
+    ssl_certificate_key /certificates/cert.key;
+    ssl_session_cache   shared:SSL:10m;
+    ssl_session_timeout 10m;
+
+
+    location /api {
+        proxy_pass http://moeflow-backend:5000/;
+
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+
+    location / {
+        root /build;
+        try_files $uri /index.html;
+    }
+}

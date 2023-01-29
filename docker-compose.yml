@@ -1,0 +1,76 @@
+version: "3.8"
+
+services:
+  moeflow-mongodb:
+    image: mongo:4.4.1
+    restart: always
+    volumes:
+      - ./mongodb/data/db:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASS}
+    networks:
+      - default
+
+  moeflow-rabbitmq:
+    image: rabbitmq:3.8.9-management
+    restart: always
+    volumes:
+      - ./rabbitmq:/var/lib/rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS}
+      RABBITMQ_DEFAULT_VHOST: ${RABBITMQ_VHOST_NAME}
+    networks:
+      - default
+
+  moeflow-backend:
+    image: ghcr.io/kozzzx/moeflow-backend:${MOEFLOW_BACKEND_VERSION}
+    restart: always
+    environment:
+      CONFIG_PATH: "/app/config.py"
+    env_file:
+      - .env
+    networks:
+      - default
+    command: gunicorn -t 120 -w 4 -b 0.0.0.0:5000 "app:create_app()"
+
+  moeflow-celery-default:
+    image: ghcr.io/kozzzx/moeflow-backend:${MOEFLOW_BACKEND_VERSION}
+    restart: always
+    environment:
+      CONFIG_PATH: "/app/config.py"
+    env_file:
+      - .env
+    networks:
+      - default
+    command: celery -A app.celery worker -n default --loglevel=info
+
+  moeflow-celery-output:
+    image: ghcr.io/kozzzx/moeflow-backend:${MOEFLOW_BACKEND_VERSION}
+    restart: always
+    environment:
+      CONFIG_PATH: "/app/config.py"
+    env_file:
+      - .env
+    networks:
+      - default
+    command: celery -A app.celery worker -Q output -n output --loglevel=info
+
+  moeflow-frontend:
+    image: ghcr.io/kozzzx/moeflow-frontend:${MOEFLOW_FRONTEND_VERSION}
+    restart: always
+    volumes:
+      - ./nginx/templates:/etc/nginx/templates
+      - ./nginx/certificates:/certificates
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - DOMAIN=${DOMAIN}
+    networks:
+      - default
+
+networks:
+  default:
+    name: moeflow
