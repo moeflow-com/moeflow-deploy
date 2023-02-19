@@ -25,10 +25,11 @@ jobs:
 
       - run: sudo apt -y install atool
       - run: mkdir releases
+      
+      - run: arepack -e -F zip LabelPlus_latest.7z
+      - run: mv LabelPlus_latest.zip releases/LabelPlus_latest.zip
       - run: arepack -e -F zip LabelPlus_PS-Script_latest.7z
       - run: mv LabelPlus_PS-Script_latest.zip releases/LabelPlus_PS-Script_latest.zip
-      - run: arepack -e -F zip LabelPlus_PS-Script_latest.7z
-      - run: mv LabelPlus_latest.zip releases/LabelPlus_latest.zip
       
       - name: Upload to oss
         id: upload_to_oss
