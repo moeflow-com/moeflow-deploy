@@ -9,7 +9,8 @@ jobs:
   update:
     runs-on: ubuntu-latest
     steps:
-      - uses: houqp/download-release-assets@v1
+      - name: Download Release Assets
+        uses: houqp/download-release-assets-action@v1.0.1
         with:
           repo: LabelPlus/PS-Script
           match: "LabelPlus_PS-Script_.+"
