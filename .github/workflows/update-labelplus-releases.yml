@@ -9,16 +9,27 @@ jobs:
   update:
     runs-on: ubuntu-latest
     steps:
-      - name: Download Release Assets
+      - name: Download Labelplus Release Assets
+        uses: houqp/download-release-assets-action@v1.0.1
+        with:
+          repo: LabelPlus/LabelPlus
+          match: "LabelPlus_.+"
+          rename: LabelPlus_latest.7z
+      
+      - name: Download Labelplus Photoshop Script Release Assets
         uses: houqp/download-release-assets-action@v1.0.1
         with:
           repo: LabelPlus/PS-Script
           match: "LabelPlus_PS-Script_.+"
           rename: LabelPlus_PS-Script_latest.7z
+
       - run: sudo apt -y install atool
       - run: mkdir releases
       - run: arepack -e -F zip LabelPlus_PS-Script_latest.7z
       - run: mv LabelPlus_PS-Script_latest.zip releases/LabelPlus_PS-Script_latest.zip
+      - run: arepack -e -F zip LabelPlus_PS-Script_latest.7z
+      - run: mv LabelPlus_latest.zip releases/LabelPlus_latest.zip
+      
       - name: Upload to oss
         id: upload_to_oss
         uses: tvrcgo/upload-to-oss@v0.1.1
