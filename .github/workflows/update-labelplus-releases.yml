@@ -1,4 +1,4 @@
-# Update labelplus latest releases to OSS
+# Download labelplus latest releases, convert to .zip and upload to OSS
 
 name: Update labelplus latest releases
 
@@ -35,9 +35,9 @@ jobs:
         id: upload_to_oss
         uses: tvrcgo/upload-to-oss@v0.1.1
         with:
-          key-id: ${{ secrets.MOEFLOW_STATIC_OSS_KEY_ID }}
-          key-secret: ${{ secrets.MOEFLOW_STATIC_OSS_KEY_SECRET }}
+          key-id: ${{ secrets.KOZZZX_FILES_OSS_KEY_ID }}
+          key-secret: ${{ secrets.KOZZZX_FILES_OSS_KEY_SECRET }}
           region: oss-cn-shanghai
-          bucket: moeflow-static
+          bucket: kozzzx-files
           asset-path: ./releases
-          target-path: /releases/
+          target-path: /labelplus/
