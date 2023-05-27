@@ -27,6 +27,8 @@ services:
   moeflow-backend:
     image: ghcr.io/kozzzx/moeflow-backend:${MOEFLOW_BACKEND_VERSION}
     restart: always
+    volumes:
+      - ./logs/moeflow-backend.txt:/app/logs/log.txt
     environment:
       CONFIG_PATH: "/app/config.py"
     env_file:
@@ -38,6 +40,8 @@ services:
   moeflow-celery-default:
     image: ghcr.io/kozzzx/moeflow-backend:${MOEFLOW_BACKEND_VERSION}
     restart: always
+    volumes:
+      - ./logs/moeflow-celery-default.txt:/app/logs/log.txt
     environment:
       CONFIG_PATH: "/app/config.py"
     env_file:
@@ -49,6 +53,8 @@ services:
   moeflow-celery-output:
     image: ghcr.io/kozzzx/moeflow-backend:${MOEFLOW_BACKEND_VERSION}
     restart: always
+    volumes:
+      - ./logs/moeflow-celery-output.txt:/app/logs/log.txt
     environment:
       CONFIG_PATH: "/app/config.py"
     env_file:
