@@ -1,6 +1,7 @@
 /mongodb/**
 /nginx/certificates/**
 /rabbitmq/**
+/logs/**
 /.env
 !.gitkeep
 
