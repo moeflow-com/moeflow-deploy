@@ -52,6 +52,6 @@
 
 # STEP 2 服务器部署
 
-1. 将 SSL 证书放置到 certificates 下，并命名为 `cert.key` 和 `cert.pem`
+1. 将 SSL 证书放置到 `nginx/certificates` 下，并命名为 `cert.key` 和 `cert.pem`
 1. 将 `.env.template` 改名成 `.env`，并修改其中配置
 1. 使用 `docker-compose up` 启动服务
