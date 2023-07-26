@@ -74,6 +74,7 @@ services:
       - "443:443"
     environment:
       DOMAIN: ${DOMAIN}
+      MAX_CONTENT_LENGTH_MB: ${MAX_CONTENT_LENGTH_MB}
     networks:
       - default
 

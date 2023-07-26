@@ -8,9 +8,10 @@ server {
 }
 
 server {
-    listen       80;
-    server_name  ${DOMAIN};
-    keepalive_timeout   70;
+    listen                  80;
+    server_name             ${DOMAIN};
+    keepalive_timeout       70;
+    client_max_body_size    ${MAX_CONTENT_LENGTH_MB}M;
 
     location /api {
         proxy_pass http://moeflow-backend:5000/;
@@ -37,8 +38,8 @@ server {
 
 # # https://www.example.com -> https://example.com
 # server {
-#     listen       443 ssl;
-#     server_name  www.${DOMAIN};
+#     listen              443 ssl;
+#     server_name         www.${DOMAIN};
 #     keepalive_timeout   70;
 
 #     ssl_protocols       TLSv1 TLSv1.1 TLSv1.2;
@@ -52,9 +53,10 @@ server {
 # }
 
 # server {
-#     listen       443 ssl;
-#     server_name  ${DOMAIN};
-#     keepalive_timeout   70;
+#     listen                  443 ssl;
+#     server_name             ${DOMAIN};
+#     keepalive_timeout       70;
+#     client_max_body_size    ${MAX_CONTENT_LENGTH_MB}M;
 
 #     ssl_protocols       TLSv1 TLSv1.1 TLSv1.2;
 #     ssl_ciphers         AES128-SHA:AES256-SHA:RC4-SHA:DES-CBC3-SHA:RC4-MD5;
