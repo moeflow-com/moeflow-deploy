@@ -28,6 +28,7 @@ services:
     image: ghcr.io/kozzzx/moeflow-backend:${MOEFLOW_BACKEND_VERSION}
     restart: always
     volumes:
+      - ./storage:/app/storage
       - ./logs/moeflow-backend:/app/logs
     environment:
       CONFIG_PATH: "/app/config.py"
@@ -41,6 +42,7 @@ services:
     image: ghcr.io/kozzzx/moeflow-backend:${MOEFLOW_BACKEND_VERSION}
     restart: always
     volumes:
+      - ./storage:/app/storage
       - ./logs/moeflow-celery-default:/app/logs
     environment:
       CONFIG_PATH: "/app/config.py"
@@ -54,6 +56,7 @@ services:
     image: ghcr.io/kozzzx/moeflow-backend:${MOEFLOW_BACKEND_VERSION}
     restart: always
     volumes:
+      - ./storage:/app/storage
       - ./logs/moeflow-celery-output:/app/logs
     environment:
       CONFIG_PATH: "/app/config.py"
@@ -69,6 +72,7 @@ services:
     volumes:
       - ./nginx/templates:/etc/nginx/templates
       - ./nginx/certificates:/certificates
+      - ./storage:/storage
     ports:
       - "80:80"
       - "443:443"
