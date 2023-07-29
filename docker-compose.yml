@@ -74,8 +74,8 @@ services:
       - ./nginx/certificates:/certificates
       - ./storage:/storage
     ports:
-      - "80:80"
-      - "443:443"
+      - "${HTTP_PORT}:80"
+      - "${HTTPS_PORT}:443"
     environment:
       DOMAIN: ${DOMAIN}
       MAX_CONTENT_LENGTH_MB: ${MAX_CONTENT_LENGTH_MB}

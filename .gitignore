@@ -2,6 +2,7 @@
 /nginx/certificates/**
 /rabbitmq/**
 /logs/**
+/storage/**
 /.env
 !.gitkeep
 

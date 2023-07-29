@@ -8,7 +8,7 @@ server {
 }
 
 server {
-    listen                  80;
+    listen                  80 default_server;
     server_name             ${DOMAIN};
     keepalive_timeout       70;
     client_max_body_size    ${MAX_CONTENT_LENGTH_MB}M;
@@ -25,7 +25,7 @@ server {
         if ($request_filename ~* ^.*?\.(txt|zip)$){  
             add_header Content-Disposition "attachment;";
         }
-        root /storage;
+        alias /storage;
     }
 
     location / {
@@ -60,7 +60,7 @@ server {
 # }
 
 # server {
-#     listen                  443 ssl;
+#     listen                  443 ssl default_server;
 #     server_name             ${DOMAIN};
 #     keepalive_timeout       70;
 #     client_max_body_size    ${MAX_CONTENT_LENGTH_MB}M;
