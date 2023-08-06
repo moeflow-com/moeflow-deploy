@@ -85,7 +85,7 @@ server {
 #         if ($request_filename ~* ^.*?\.(txt|zip)$){  
 #             add_header Content-Disposition "attachment;";
 #         }
-#         root /storage;
+#         alias /storage;
 #     }
 
 #     location / {
