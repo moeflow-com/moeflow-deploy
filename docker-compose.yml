@@ -46,6 +46,11 @@ services:
       - .env
     networks:
       - default
+    depends_on: &dbs
+      moeflow-rabbitmq:
+        condition: service_healthy
+      oeflow-mongodb:
+        condition: service_healthy
     command: gunicorn -t 120 -w 4 -b 0.0.0.0:5000 "app:create_app()"
 
   moeflow-celery-default:
@@ -60,6 +65,7 @@ services:
       - .env
     networks:
       - default
+    depends_on: *dbs
     command: celery -A app.celery worker -n default --loglevel=info
 
   moeflow-celery-output:
@@ -74,6 +80,7 @@ services:
       - .env
     networks:
       - default
+    depends_on: *dbs
     command: celery -A app.celery worker -Q output -n output --loglevel=info
 
   moeflow-frontend:
