@@ -11,6 +11,11 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASS}
     networks:
       - default
+    healthcheck:
+      test: ["CMD","mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      start_period: 10s
 
   moeflow-rabbitmq:
     image: ${DH_DOMAIN}/rabbitmq:3.8.9-management
@@ -23,6 +28,11 @@ services:
       RABBITMQ_DEFAULT_VHOST: ${RABBITMQ_VHOST_NAME}
     networks:
       - default
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 5s
+      timeout: 5s
+      start_period: 10s
 
   moeflow-backend:
     image: ${GHCR_DOMAIN}/kozzzx/moeflow-backend:${MOEFLOW_BACKEND_VERSION}
