@@ -3,7 +3,7 @@ version: "3.8"
 services:
   moeflow-mongodb:
     image: ${DH_DOMAIN}/mongo:4.4.1
-    restart: always
+    restart: unless-stopped
     volumes:
       - ./mongodb/data/db:/data/db
     environment:
@@ -14,7 +14,7 @@ services:
 
   moeflow-rabbitmq:
     image: ${DH_DOMAIN}/rabbitmq:3.8.9-management
-    restart: always
+    restart: unless-stopped
     volumes:
       - ./rabbitmq:/var/lib/rabbitmq
     environment:
@@ -26,7 +26,7 @@ services:
 
   moeflow-backend:
     image: ${GHCR_DOMAIN}/kozzzx/moeflow-backend:${MOEFLOW_BACKEND_VERSION}
-    restart: always
+    restart: unless-stopped
     volumes:
       - ./storage:/app/storage
       - ./logs/moeflow-backend:/app/logs
@@ -40,7 +40,7 @@ services:
 
   moeflow-celery-default:
     image: ${GHCR_DOMAIN}/kozzzx/moeflow-backend:${MOEFLOW_BACKEND_VERSION}
-    restart: always
+    restart: unless-stopped
     volumes:
       - ./storage:/app/storage
       - ./logs/moeflow-celery-default:/app/logs
@@ -54,7 +54,7 @@ services:
 
   moeflow-celery-output:
     image: ${GHCR_DOMAIN}/kozzzx/moeflow-backend:${MOEFLOW_BACKEND_VERSION}
-    restart: always
+    restart: unless-stopped
     volumes:
       - ./storage:/app/storage
       - ./logs/moeflow-celery-output:/app/logs
@@ -68,7 +68,7 @@ services:
 
   moeflow-frontend:
     image: ${GHCR_DOMAIN}/kozzzx/moeflow-frontend:${MOEFLOW_FRONTEND_VERSION}
-    restart: always
+    restart: unless-stopped
     volumes:
       - ./nginx/templates:/etc/nginx/templates
       - ./nginx/certificates:/certificates
