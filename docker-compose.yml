@@ -13,7 +13,7 @@ services:
       - default
     healthcheck:
       test: ["CMD","mongo", "--eval", "db.adminCommand('ping')"]
-      interval: 5s
+      interval: 15s
       timeout: 5s
       start_period: 10s
 
