@@ -3,7 +3,7 @@ version: "3.8"
 services:
   moeflow-mongodb:
     image: ${DH_DOMAIN}/mongo:4.4.1
-    restart: always
+    restart: unless-stopped
     volumes:
       - ./mongodb/data/db:/data/db
     environment:
@@ -11,10 +11,15 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASS}
     networks:
       - default
+    healthcheck:
+      test: ["CMD","mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 15s
+      timeout: 5s
+      start_period: 10s
 
   moeflow-rabbitmq:
     image: ${DH_DOMAIN}/rabbitmq:3.8.9-management
-    restart: always
+    restart: unless-stopped
     volumes:
       - ./rabbitmq:/var/lib/rabbitmq
     environment:
@@ -23,10 +28,15 @@ services:
       RABBITMQ_DEFAULT_VHOST: ${RABBITMQ_VHOST_NAME}
     networks:
       - default
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 5s
+      timeout: 5s
+      start_period: 10s
 
   moeflow-backend:
     image: ${GHCR_DOMAIN}/kozzzx/moeflow-backend:${MOEFLOW_BACKEND_VERSION}
-    restart: always
+    restart: unless-stopped
     volumes:
       - ./storage:/app/storage
       - ./logs/moeflow-backend:/app/logs
@@ -36,11 +46,16 @@ services:
       - .env
     networks:
       - default
+    depends_on: &backend-deps
+      moeflow-rabbitmq:
+        condition: service_healthy
+      moeflow-mongodb:
+        condition: service_healthy
     command: gunicorn -t 120 -w 4 -b 0.0.0.0:5000 "app:create_app()"
 
   moeflow-celery-default:
     image: ${GHCR_DOMAIN}/kozzzx/moeflow-backend:${MOEFLOW_BACKEND_VERSION}
-    restart: always
+    restart: unless-stopped
     volumes:
       - ./storage:/app/storage
       - ./logs/moeflow-celery-default:/app/logs
@@ -50,11 +65,12 @@ services:
       - .env
     networks:
       - default
+    depends_on: *backend-deps
     command: celery -A app.celery worker -n default --loglevel=info
 
   moeflow-celery-output:
     image: ${GHCR_DOMAIN}/kozzzx/moeflow-backend:${MOEFLOW_BACKEND_VERSION}
-    restart: always
+    restart: unless-stopped
     volumes:
       - ./storage:/app/storage
       - ./logs/moeflow-celery-output:/app/logs
@@ -64,11 +80,12 @@ services:
       - .env
     networks:
       - default
+    depends_on: *backend-deps
     command: celery -A app.celery worker -Q output -n output --loglevel=info
 
   moeflow-frontend:
     image: ${GHCR_DOMAIN}/kozzzx/moeflow-frontend:${MOEFLOW_FRONTEND_VERSION}
-    restart: always
+    restart: unless-stopped
     volumes:
       - ./nginx/templates:/etc/nginx/templates
       - ./nginx/certificates:/certificates
