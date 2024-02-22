@@ -34,7 +34,7 @@ services:
       timeout: 5s
       start_period: 10s
 
-  moeflow-backend:
+  moeflow-backend: &backend_base
     image: ${GHCR_DOMAIN}/moeflow-com/moeflow-backend:${MOEFLOW_BACKEND_VERSION}
     restart: unless-stopped
     volumes:
@@ -54,33 +54,17 @@ services:
     command: gunicorn -t 120 -w 4 -b 0.0.0.0:5000 "app:create_app()"
 
   moeflow-celery-default:
-    image: ${GHCR_DOMAIN}/moeflow-com/moeflow-backend:${MOEFLOW_BACKEND_VERSION}
-    restart: unless-stopped
+    <<: *backend_base
     volumes:
       - ./storage:/app/storage
       - ./logs/moeflow-celery-default:/app/logs
-    environment:
-      CONFIG_PATH: "/app/config.py"
-    env_file:
-      - .env
-    networks:
-      - default
-    depends_on: *backend-deps
     command: celery -A app.celery worker -n default --loglevel=info
 
   moeflow-celery-output:
-    image: ${GHCR_DOMAIN}/moeflow-com/moeflow-backend:${MOEFLOW_BACKEND_VERSION}
-    restart: unless-stopped
+    <<: *backend_base
     volumes:
       - ./storage:/app/storage
       - ./logs/moeflow-celery-output:/app/logs
-    environment:
-      CONFIG_PATH: "/app/config.py"
-    env_file:
-      - .env
-    networks:
-      - default
-    depends_on: *backend-deps
     command: celery -A app.celery worker -Q output -n output --loglevel=info
 
   moeflow-frontend:
@@ -96,6 +80,7 @@ services:
     environment:
       DOMAIN: ${DOMAIN}
       MAX_CONTENT_LENGTH_MB: ${MAX_CONTENT_LENGTH_MB}
+    links: [moeflow-backend]
     networks:
       - default
 
