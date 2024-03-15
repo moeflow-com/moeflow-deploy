@@ -58,14 +58,14 @@ services:
     volumes:
       - ./storage:/app/storage
       - ./logs/moeflow-celery-default:/app/logs
-    command: celery -A app.celery worker -n default --loglevel=info
+    command: celery --app app.celery worker --queues default --hostname celery.default --loglevel=info
 
   moeflow-celery-output:
     <<: *backend_base
     volumes:
       - ./storage:/app/storage
       - ./logs/moeflow-celery-output:/app/logs
-    command: celery -A app.celery worker -Q output -n output --loglevel=info
+    command: celery --app app.celery worker --queues output --hostname celery.output --loglevel=info
 
   moeflow-frontend:
     image: ${GHCR_DOMAIN}/${MOEFLOW_FRONTEND_IMAGE}:${MOEFLOW_FRONTEND_VERSION}
