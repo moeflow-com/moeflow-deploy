@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   moeflow-mongodb:
     ports:
@@ -24,3 +22,10 @@ services:
 
   moeflow-celery-output:
     command: celery --app app.celery worker --queues output --hostname celery.output --loglevel=debug
+
+  moeflow-celery-mit:
+    build:
+      dockerfile: ../manga-image-translator/Dockerfile.moeflow_worker
+      context: ../manga-image-translator
+      cache_from:
+        - type=local,src=/var/conda/cache,user=root
