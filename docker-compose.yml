@@ -50,11 +50,12 @@ services:
     depends_on:
       moeflow-backend-init:
         condition: service_completed_successfully
+    logging: *log_fluentd
 
   moeflow-backend-init:
     <<: *backend_base
     command: python3 manage.py migrate
-    restart: no
+    restart: 'no'
     depends_on: &backend-deps
       moeflow-rabbitmq:
         condition: service_healthy
@@ -63,16 +64,10 @@ services:
 
   moeflow-celery-default:
     <<: *backend_base
-    volumes:
-      - ./storage:/app/storage
-      - ./logs/moeflow-celery-default:/app/logs
     command: celery --app app.celery worker --queues default --hostname celery.default --loglevel=info
 
   moeflow-celery-output:
     <<: *backend_base
-    volumes:
-      - ./storage:/app/storage
-      - ./logs/moeflow-celery-output:/app/logs
     command: celery --app app.celery worker --queues output --hostname celery.output --loglevel=info
 
   moeflow-frontend:
