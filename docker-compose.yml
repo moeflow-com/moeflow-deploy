@@ -36,7 +36,7 @@ services:
 
   moeflow-backend: &backend_base
     image: ${GHCR_DOMAIN}/${MOEFLOW_BACKEND_IMAGE}:${MOEFLOW_BACKEND_VERSION}
-    restart: unless-stopped
+    command: gunicorn -t 120 -w 4 -b 0.0.0.0:5000 "app:create_app()"
     volumes:
       - ./storage:/app/storage
       - ./logs/moeflow-backend:/app/logs
@@ -46,12 +46,10 @@ services:
       - .env
     networks:
       - default
+    restart: unless-stopped
     depends_on:
       moeflow-backend-init:
         condition: service_completed_successfully
-    # NOTE IDK how to easily prepend a pip command with deafult entrypoint/command.
-    # Just `docker-compose build` when dep changes.
-    command: gunicorn -t 120 -w 4 -b 0.0.0.0:5000 "app:create_app()"
 
   moeflow-backend-init:
     <<: *backend_base
