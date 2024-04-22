@@ -73,6 +73,44 @@ services:
     <<: *backend_base
     command: celery --app app.celery worker --queues output --hostname celery.output --loglevel=info
 
+  moeflow-celery-mit:
+    build:
+      dockerfile: ../manga-image-translator/Dockerfile.moeflow_worker
+      context: ../manga-image-translator
+      cache_from:
+        - type=local,src=/var/conda/cache,user=root
+    restart: unless-stopped
+    volumes:
+      - ../manga-image-translator:/app:ro
+      - ./storage:/var/lib/moeflow-storage
+      - ./mit-root:/root:rw # for models in /root/.cache/huggingface
+      # - ./mit-root:/root:rw
+    env_file:
+      - '.env-mit-worker'
+    entrypoint: bash
+    command:
+      - -uexc
+      # - pipdeptree
+      # - pwd; ls
+      - |
+        # exec conda run -n mit-py311 celery --app moeflow_worker worker --queues mit --loglevel=debug --concurrency=2
+        # conda activate mit-py311
+        # make conda-env
+        # exec celery --app moeflow_worker worker --queues mit --loglevel=debug --concurrency=2
+        # conda run -n mit-py311 --no-capture-output pip list
+        conda run -n mit-py311 --no-capture-output conda env update --prune --file conda.yaml
+        exec conda run -n mit-py311 --no-capture-output celery --app moeflow_worker worker --queues mit --loglevel=debug --concurrency=8
+    links: [moeflow-rabbitmq, moeflow-mongodb]
+    profiles: [MIT]
+    depends_on: *backend-deps
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities:
+                - gpu
   moeflow-frontend:
     image: ${GHCR_DOMAIN}/${MOEFLOW_FRONTEND_IMAGE}:${MOEFLOW_FRONTEND_VERSION}
     restart: unless-stopped

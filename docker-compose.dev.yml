@@ -1,0 +1,26 @@
+version: "3.8"
+
+services:
+  moeflow-mongodb:
+    ports:
+      - 25017:27017
+
+  moeflow-rabbitmq:
+    ports:
+      - 25672:15672 # management UI
+
+  moeflow-backend:
+    image: null
+    build: ../moeflow-backend  # for local dev
+    # TODO: should prepend `pip install` to gunicorn
+    command: gunicorn -t 120 -w 4 --reload -b 0.0.0.0:5000 "app:create_app()"
+    volumes:
+      - ../moeflow-backend:/app
+      - ./storage:/app/storage
+      - ./logs/moeflow-backend:/app/logs
+
+  moeflow-celery-default:
+    command: celery --app app.celery worker --queues default --hostname celery.default --loglevel=debug
+
+  moeflow-celery-output:
+    command: celery --app app.celery worker --queues output --hostname celery.output --loglevel=debug
