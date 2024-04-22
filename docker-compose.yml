@@ -46,12 +46,22 @@ services:
       - .env
     networks:
       - default
+    depends_on:
+      moeflow-backend-init:
+        condition: service_completed_successfully
+    # NOTE IDK how to easily prepend a pip command with deafult entrypoint/command.
+    # Just `docker-compose build` when dep changes.
+    command: gunicorn -t 120 -w 4 -b 0.0.0.0:5000 "app:create_app()"
+
+  moeflow-backend-init:
+    <<: *backend_base
+    command: python3 manage.py migrate
+    restart: no
     depends_on: &backend-deps
       moeflow-rabbitmq:
         condition: service_healthy
       moeflow-mongodb:
         condition: service_healthy
-    command: gunicorn -t 120 -w 4 -b 0.0.0.0:5000 "app:create_app()"
 
   moeflow-celery-default:
     <<: *backend_base
