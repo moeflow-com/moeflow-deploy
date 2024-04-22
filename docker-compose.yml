@@ -50,7 +50,6 @@ services:
     depends_on:
       moeflow-backend-init:
         condition: service_completed_successfully
-    logging: *log_fluentd
 
   moeflow-backend-init:
     <<: *backend_base
