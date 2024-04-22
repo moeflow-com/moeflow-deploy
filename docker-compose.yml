@@ -35,6 +35,10 @@ services:
       start_period: 10s
 
   moeflow-backend: &backend_base
+    # overrides for local dev
+    # TODO: should prepend `pip install` to gunicorn
+    # build: ../moeflow-backend  # for local dev
+    # command: gunicorn -t 120 -w 4 --reload -b 0.0.0.0:5000 "app:create_app()"
     image: ${GHCR_DOMAIN}/${MOEFLOW_BACKEND_IMAGE}:${MOEFLOW_BACKEND_VERSION}
     command: gunicorn -t 120 -w 4 -b 0.0.0.0:5000 "app:create_app()"
     volumes:
