@@ -33,10 +33,6 @@ services:
       start_period: 10s
 
   moeflow-backend: &backend_base
-    # overrides for local dev
-    # TODO: should prepend `pip install` to gunicorn
-    # build: ../moeflow-backend  # for local dev
-    # command: gunicorn -t 120 -w 4 --reload -b 0.0.0.0:5000 "app:create_app()"
     image: ${GHCR_DOMAIN}/${MOEFLOW_BACKEND_IMAGE}:${MOEFLOW_BACKEND_VERSION}
     command: gunicorn -t 120 -w 4 -b 0.0.0.0:5000 "app:create_app()"
     volumes:
@@ -72,27 +68,16 @@ services:
     command: celery --app app.celery worker --queues output --hostname celery.output --loglevel=info
 
   moeflow-celery-mit:
-    # TOOD: image
+    image: ghcr.io/moeflow-com/manga-image-translator:sha-d0fed2d
     restart: unless-stopped
     volumes:
-      - ../manga-image-translator:/app:ro
-      - ./storage:/var/lib/moeflow-storage
-      - ./mit-root:/root:rw # for models in /root/.cache/huggingface
-      # - ./mit-root:/root:rw
+      - ./storage:/app/storage
     env_file:
       - '.env-mit-worker'
     entrypoint: bash
     command:
       - -uexc
-      # - pipdeptree
-      # - pwd; ls
       - |
-        # exec conda run -n mit-py311 celery --app moeflow_worker worker --queues mit --loglevel=debug --concurrency=2
-        # conda activate mit-py311
-        # make conda-env
-        # exec celery --app moeflow_worker worker --queues mit --loglevel=debug --concurrency=2
-        # conda run -n mit-py311 --no-capture-output pip list
-        conda run -n mit-py311 --no-capture-output conda env update --prune --file conda.yaml
         exec conda run -n mit-py311 --no-capture-output celery --app moeflow_worker worker --queues mit --loglevel=debug --concurrency=8
     links: [moeflow-rabbitmq, moeflow-mongodb]
     profiles: [MIT]

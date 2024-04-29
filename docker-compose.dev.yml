@@ -7,8 +7,7 @@ services:
     ports:
       - 25672:15672 # management UI
 
-  moeflow-backend:
-    image: null
+  moeflow-backend: &backend_dev
     build: ../moeflow-backend  # for local dev
     # TODO: should prepend `pip install` to gunicorn
     command: gunicorn -t 120 -w 4 --reload -b 0.0.0.0:5000 "app:create_app()"
@@ -17,15 +16,29 @@ services:
       - ./storage:/app/storage
       - ./logs/moeflow-backend:/app/logs
 
+  moeflow-init:
+    <<: *backend_dev
+
   moeflow-celery-default:
+    <<: *backend_dev
     command: celery --app app.celery worker --queues default --hostname celery.default --loglevel=debug
 
   moeflow-celery-output:
+    <<: *backend_dev
     command: celery --app app.celery worker --queues output --hostname celery.output --loglevel=debug
 
   moeflow-celery-mit:
-    build:
-      dockerfile: ../manga-image-translator/Dockerfile.moeflow_worker
-      context: ../manga-image-translator
-      cache_from:
-        - type=local,src=/var/conda/cache,user=root
+    # build:
+    #   dockerfile: ../manga-image-translator/Dockerfile.moeflow_worker
+    #   context: ../manga-image-translator
+    #   cache_from:
+    #     - type=local,src=/var/conda/cache,user=root
+    volumes:
+      - ../manga-image-translator:/app:ro # code and models
+      - ./storage:/app/storage
+      - ./mit-root:/root:rw # to cache models in /root/.cache/huggingface
+    entrypoint: bash
+    command:
+      - |
+        conda run -n mit-py311 --no-capture-output conda env update --prune --file conda.yaml
+        exec conda run -n mit-py311 --no-capture-output celery --app moeflow_worker worker --queues mit --loglevel=debug --concurrency=8
