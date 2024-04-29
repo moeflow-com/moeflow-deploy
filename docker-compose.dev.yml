@@ -39,6 +39,7 @@ services:
       - ./mit-root:/root:rw # to cache models in /root/.cache/huggingface
     entrypoint: bash
     command:
+      - -uexc
       - |
         conda run -n mit-py311 --no-capture-output conda env update --prune --file conda.yaml
         exec conda run -n mit-py311 --no-capture-output celery --app moeflow_worker worker --queues mit --loglevel=debug --concurrency=8
