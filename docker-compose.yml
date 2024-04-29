@@ -38,8 +38,6 @@ services:
     volumes:
       - ./storage:/app/storage
       - ./logs/moeflow-backend:/app/logs
-    environment:
-      CONFIG_PATH: "/app/config.py"
     env_file:
       - .env
     networks:

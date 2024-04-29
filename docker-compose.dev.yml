@@ -12,12 +12,13 @@ services:
     # TODO: should prepend `pip install` to gunicorn
     command: gunicorn -t 120 -w 4 --reload -b 0.0.0.0:5000 "app:create_app()"
     volumes:
-      - ../moeflow-backend:/app
+      - ../moeflow-backend:/app:rw
       - ./storage:/app/storage
       - ./logs/moeflow-backend:/app/logs
 
-  moeflow-init:
+  moeflow-backend-init:
     <<: *backend_dev
+    command: python3 manage.py migrate
 
   moeflow-celery-default:
     <<: *backend_dev
