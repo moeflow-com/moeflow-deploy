@@ -3,7 +3,8 @@
 /rabbitmq/**
 /logs/**
 /storage/**
-/.env
+.env*
+!.env*.sample
 !.gitkeep
 
 .DS_Store
