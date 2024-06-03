@@ -4,14 +4,16 @@
 
 请参见部署视频演示 https://www.bilibili.com/video/BV1EX4y1J7MA/
 
-## docker-compose
+## docker compose
 
 建议的部署方式。
 
+0. 安装 [docker](https://docs.docker.com/engine/install/) 和 [docker-compose-plugin](https://docs.docker.com/compose/install/)
+    - 注: 正确设置环境变量需要近期的docker-compose-plugin. v2.27.0 经测试可用.
 1. clone 此repo
 2. 将 `.env-backend.sample` 模板复制为 `.env-backend` ，并按模板内说明设置环境变量
 3. 将 `.env.sample` 模板复制为 `.env` ，并按模板内说明设置环境变量
-4. 运行 `docker-compose up`
+4. 运行 `docker compose up`
 
 ## FAQ
 
