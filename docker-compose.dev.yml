@@ -9,21 +9,26 @@ services:
 
   moeflow-backend: &backend_dev
     build: ../moeflow-backend  # for local dev
-    # TODO: should prepend `pip install` to gunicorn
-    command: gunicorn -t 120 -w 4 --reload -b 0.0.0.0:5000 "app:create_app()"
+    ports:
+      - 5000:5000
+    # TODO: should prepend `pip install` to gunicorn ?
+    command: gunicorn -t 120 -w 4 --reload -b 0.0.0.0:5000 --log-level=debug "app:create_app()"
     volumes:
       - ../moeflow-backend:/app # gets merged with docker-compose.yml
 
   moeflow-backend-init:
     <<: *backend_dev
+    ports: []
     command: python3 manage.py migrate
 
   moeflow-celery-default:
     <<: *backend_dev
+    ports: []
     command: celery --app app.celery worker --queues default --hostname celery.default --loglevel=debug
 
   moeflow-celery-output:
     <<: *backend_dev
+    ports: []
     command: celery --app app.celery worker --queues output --hostname celery.output --loglevel=debug
 
   moeflow-celery-mit:
@@ -33,6 +38,8 @@ services:
     #   context: ../manga-image-translator
     #   cache_from:
     #     - type=local,src=/var/conda/cache,user=root
+    env_file:
+      - ./.env-mit-worker
     volumes:
       - ../manga-image-translator:/app:rw # code and models
       - ./storage:/app/storage
