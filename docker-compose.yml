@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   moeflow-mongodb:
     image: ${DH_DOMAIN}/mongo:4.4.1
@@ -40,10 +38,19 @@ services:
     volumes:
       - ./storage:/app/storage
       - ./logs/moeflow-backend:/app/logs
-    environment:
-      CONFIG_PATH: "/app/config.py"
     env_file:
-      - .env
+      - .env-backend
+    environment:
+      # forward envs set in .env
+      DOMAIN: ${DOMAIN}
+      HTTP_PORT: ${HTTP_PORT}
+      HTTPS_PORT: ${HTTPS_PORT}
+      MONGODB_USER: ${MONGODB_USER}
+      MONGODB_PASS: ${MONGODB_PASS}
+      # MONGODB_DB_NAME: ${MONGODB_DB_NAME}
+      RABBITMQ_USER: ${RABBITMQ_USER}
+      RABBITMQ_PASS: ${RABBITMQ_PASS}
+      RABBITMQ_VHOST_NAME: ${RABBITMQ_VHOST_NAME}
     networks:
       - default
     restart: unless-stopped
@@ -69,6 +76,22 @@ services:
     <<: *backend_base
     command: celery --app app.celery worker --queues output --hostname celery.output --loglevel=info
 
+  moeflow-celery-mit:
+    image: ${GHCR_DOMAIN}/${MOEFLOW_MIT_WORKER_IMAGE:-UNSET}:${MOEFLOW_MIT_WORKER_VERSION:-UNSET}
+    restart: unless-stopped
+    volumes:
+      - ./storage:/app/storage
+    env_file:
+      - '.env-mit-worker'
+    entrypoint: bash
+    command:
+      - -uexc
+      - |
+        exec conda run -n mit-py311 --no-capture-output celery --app moeflow_worker worker --queues mit --loglevel=debug --concurrency=8
+    links: [moeflow-rabbitmq, moeflow-mongodb]
+    profiles: [mit-worker]
+    depends_on: *backend-deps
+
   moeflow-frontend:
     image: ${GHCR_DOMAIN}/${MOEFLOW_FRONTEND_IMAGE}:${MOEFLOW_FRONTEND_VERSION}
     restart: unless-stopped
@@ -76,6 +99,7 @@ services:
       - ./nginx/templates:/etc/nginx/templates
       - ./nginx/certificates:/certificates
       - ./storage:/storage
+      # - ../moeflow-frontend/build:/build
     ports:
       - "${HTTP_PORT}:80"
       - "${HTTPS_PORT}:443"
@@ -86,6 +110,6 @@ services:
     networks:
       - default
 
-networks:
+networks: #FIXME: can we remove this?
   default:
     name: moeflow
