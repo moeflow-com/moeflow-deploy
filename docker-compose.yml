@@ -51,6 +51,7 @@ services:
       RABBITMQ_USER: ${RABBITMQ_USER}
       RABBITMQ_PASS: ${RABBITMQ_PASS}
       RABBITMQ_VHOST_NAME: ${RABBITMQ_VHOST_NAME}
+      MAX_CONTENT_LENGTH_MB: ${MAX_CONTENT_LENGTH_MB}
     networks:
       - default
     restart: unless-stopped
@@ -105,6 +106,7 @@ services:
       - "${HTTPS_PORT}:443"
     environment:
       DOMAIN: ${DOMAIN}
+      MAX_CONTENT_LENGTH_MB: ${MAX_CONTENT_LENGTH_MB}
     links: [moeflow-backend]
     networks:
       - default
