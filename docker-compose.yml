@@ -42,17 +42,9 @@ services:
       - .env-backend
     environment:
       # forward envs set in .env
-      # TODO: deprecate over STORAGE_DOMAIN
-      DOMAIN: ${DOMAIN}
-      HTTP_PORT: ${HTTP_PORT}
-      HTTPS_PORT: ${HTTPS_PORT}
-      # TODO: change into MONGODB_URI
-      MONGODB_USER: ${MONGODB_USER}
-      MONGODB_PASS: ${MONGODB_PASS}
-      # TODO: change into CELERY_BROKER_URL
-      RABBITMQ_USER: ${RABBITMQ_USER}
-      RABBITMQ_PASS: ${RABBITMQ_PASS}
-      RABBITMQ_VHOST_NAME: ${RABBITMQ_VHOST_NAME}
+      STORAGE_DOMAIN: http://${DOMAIN}:${HTTP_PORT}/storage/
+      MONGODB_URI: mongodb://${MONGODB_USER}:${MONGODB_PASS}@moeflow-mongodb:27017/moeflow?authSource=admin
+      CELERY_BROKER_URL: amqp://${RABBITMQ_USER}:${RABBITMQ_PASS}@moeflow-rabbitmq:5672/${RABBITMQ_VHOST_NAME}
       MAX_CONTENT_LENGTH_MB: ${MAX_CONTENT_LENGTH_MB}
     networks:
       - default
