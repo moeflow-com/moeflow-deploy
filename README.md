@@ -10,7 +10,8 @@
 
 0. 安装 [docker](https://docs.docker.com/engine/install/) 和 [docker-compose-plugin](https://docs.docker.com/compose/install/)
     - 注: 旧版本docker-compose可能无法正确设置环境变量. docker-compose-plugin v2.27.0 经测试可用.
-1. clone 此repo
+1. 下载本repo的 [最新release](https://github.com/moeflow-com/moeflow-deploy/releases) 并解压
+    - 非开发者不建议clone本repo: 代码最新状态可能和image不匹配
 2. 将 `.env-backend.sample` 模板复制为 `.env-backend` ，并按模板内说明设置环境变量
 3. 将 `.env.sample` 模板复制为 `.env` ，并按模板内说明设置环境变量
 4. 运行 `docker compose up`
