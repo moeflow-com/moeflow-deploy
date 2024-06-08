@@ -1,11 +1,12 @@
 services:
   moeflow-mongodb:
     ports:
-      - 25017:27017
+      - 27017:27017
 
   moeflow-rabbitmq:
     ports:
-      - 25672:15672 # management UI
+      - 5672:5672 # AMQP
+      - 15672:15672 # management UI
 
   moeflow-backend: &backend_dev
     build: ../moeflow-backend  # for local dev
