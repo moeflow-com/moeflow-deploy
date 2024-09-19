@@ -7,10 +7,12 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USER}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASS}
+    command: ['--quiet', '--setParameter', 'logLevel=0']
     networks:
       - default
     healthcheck:
-      test: ["CMD","mongo", "--eval", "db.adminCommand('ping')"]
+      # test: ["CMD","mongo", "--eval", "db.adminCommand('ping')"]
+      test: ["CMD","bash", '-c', "exec 9<> /dev/tcp/127.0.0.1/27017"]
       interval: 15s
       timeout: 5s
       start_period: 10s
