@@ -1,18 +1,19 @@
 services:
   moeflow-mongodb:
     ports:
-      - 25017:27017
+      - 127.0.0.1:27017:27017
 
   moeflow-rabbitmq:
     ports:
-      - 25672:15672 # management UI
+      - 127.0.0.1:5672:5672 # AMQP
+      - 127.0.0.1:15672:15672 # management UI
 
   moeflow-backend: &backend_dev
     build: ../moeflow-backend  # for local dev
     ports:
       - 5000:5000
     # TODO: should prepend `pip install` to gunicorn ?
-    command: gunicorn -t 120 -w 4 --reload -b 0.0.0.0:5000 --log-level=debug "app:create_app()"
+    command: gunicorn -t 120 -w 1 --reload -b 0.0.0.0:5000 --log-level=DEBUG "app:create_app()"
     volumes:
       - ../moeflow-backend:/app # gets merged with docker-compose.yml
 

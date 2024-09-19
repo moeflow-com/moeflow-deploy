@@ -42,15 +42,9 @@ services:
       - .env-backend
     environment:
       # forward envs set in .env
-      DOMAIN: ${DOMAIN}
-      HTTP_PORT: ${HTTP_PORT}
-      HTTPS_PORT: ${HTTPS_PORT}
-      MONGODB_USER: ${MONGODB_USER}
-      MONGODB_PASS: ${MONGODB_PASS}
-      # MONGODB_DB_NAME: ${MONGODB_DB_NAME}
-      RABBITMQ_USER: ${RABBITMQ_USER}
-      RABBITMQ_PASS: ${RABBITMQ_PASS}
-      RABBITMQ_VHOST_NAME: ${RABBITMQ_VHOST_NAME}
+      STORAGE_DOMAIN: http://${DOMAIN}:${HTTP_PORT}/storage/
+      MONGODB_URI: mongodb://${MONGODB_USER}:${MONGODB_PASS}@moeflow-mongodb:27017/moeflow?authSource=admin
+      CELERY_BROKER_URL: amqp://${RABBITMQ_USER}:${RABBITMQ_PASS}@moeflow-rabbitmq:5672/${RABBITMQ_VHOST_NAME}
       MAX_CONTENT_LENGTH_MB: ${MAX_CONTENT_LENGTH_MB}
     networks:
       - default
