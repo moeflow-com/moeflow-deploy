@@ -8,6 +8,14 @@ services:
       - 127.0.0.1:5672:5672 # AMQP
       - 127.0.0.1:15672:15672 # management UI
 
+  mongo-gui:
+    image: ugleiton/mongo-gui
+    restart: unless-stopped
+    ports:
+      - "4321:4321"
+    environment:
+      MONGO_URL: mongodb://${MONGODB_USER}:${MONGODB_PASS}@moeflow-mongodb:27017/moeflow?authSource=admin
+
   moeflow-backend: &backend_dev
     build: ../moeflow-backend  # for local dev
     ports:
