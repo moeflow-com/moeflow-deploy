@@ -44,7 +44,6 @@ services:
       - .env-backend
     environment:
       # forward envs set in .env
-      DOMAIN: ${DOMAIN}
       STORAGE_DOMAIN: https://${DOMAIN}/storage/
       MONGODB_URI: mongodb://${MONGODB_USER}:${MONGODB_PASS}@moeflow-mongodb:27017/moeflow?authSource=admin
       CELERY_BROKER_URL: amqp://${RABBITMQ_USER}:${RABBITMQ_PASS}@moeflow-rabbitmq:5672/${RABBITMQ_VHOST_NAME}
