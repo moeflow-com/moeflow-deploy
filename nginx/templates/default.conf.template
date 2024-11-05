@@ -14,7 +14,12 @@ server {
     client_max_body_size    ${MAX_CONTENT_LENGTH_MB}M;
 
     location /api {
+        # Flask api server
         proxy_pass http://moeflow-backend:5000/;
+
+        add_header Cache-Control "no-cache";
+        gzip on;
+        gzip_proxied any;
 
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
@@ -22,15 +27,22 @@ server {
     }
 
     location /storage {
-        if ($request_filename ~* ^.*?\.(txt|zip)$){  
+        # no gzip for images
+        if ($request_filename ~* ^.*?\.(txt|zip)$){
             add_header Content-Disposition "attachment;";
         }
         alias /storage;
     }
 
     location / {
+        # static assets
         root /build;
         try_files $uri /index.html;
+
+        add_header Cache-Control "public, must-revalidate";
+        gzip on;
+        gzip_types *;
+        gzip_proxied any;
     }
 }
 
@@ -74,7 +86,12 @@ server {
 
 
 #     location /api {
+#         # Flask api server
 #         proxy_pass http://moeflow-backend:5000/;
+
+#         add_header Cache-Control "no-cache";
+#         gzip on;
+#         gzip_proxied any;
 
 #         proxy_set_header Host $host;
 #         proxy_set_header X-Real-IP $remote_addr;
@@ -91,5 +108,10 @@ server {
 #     location / {
 #         root /build;
 #         try_files $uri /index.html;
+#
+#         add_header Cache-Control "public, must-revalidate";
+#         gzip on;
+#         gzip_types *;
+#         gzip_proxied any;
 #     }
 # }
