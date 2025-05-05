@@ -15,47 +15,26 @@ services:
       - "4321:4321"
     environment:
       MONGO_URL: mongodb://${MONGODB_USER}:${MONGODB_PASS}@moeflow-mongodb:27017/moeflow?authSource=admin
+    logging:
+      driver: none
+    attach: false
 
-  moeflow-backend: &backend_dev
+  moeflow-backend:
     build: ../moeflow-backend  # for local dev
     ports:
-      - 5000:5000
+      - 127.0.0.1:5000:5000
     # TODO: should prepend `pip install` to gunicorn ?
     command: gunicorn -t 120 -w 1 --reload -b 0.0.0.0:5000 --log-level=DEBUG "app:create_app()"
+    # environment:
+    #   LOG_LEVEL: DEBUG
     volumes:
       - ../moeflow-backend:/app # gets merged with docker-compose.yml
 
   moeflow-backend-init:
-    <<: *backend_dev
-    ports: []
     command: python3 manage.py migrate
 
   moeflow-celery-default:
-    <<: *backend_dev
-    ports: []
     command: celery --app app.celery worker --queues default --hostname celery.default --loglevel=debug
 
   moeflow-celery-output:
-    <<: *backend_dev
-    ports: []
     command: celery --app app.celery worker --queues output --hostname celery.output --loglevel=debug
-
-  moeflow-celery-mit:
-    image: ghcr.io/moeflow-com/manga-image-translator:sha-d0fed2d
-    # build:
-    #   dockerfile: ../manga-image-translator/Dockerfile.moeflow_worker
-    #   context: ../manga-image-translator
-    #   cache_from:
-    #     - type=local,src=/var/conda/cache,user=root
-    env_file:
-      - ./.env-mit-worker
-    volumes:
-      - ../manga-image-translator:/app:rw # code and models
-      - ./storage:/app/storage
-      - ./mit-root:/root:rw # to cache models in /root/.cache/huggingface
-    entrypoint: bash
-    command:
-      - -uexc
-      - |
-        conda run -n mit-py311 --no-capture-output conda env update --prune --file conda.yaml
-        exec conda run -n mit-py311 --no-capture-output celery --app moeflow_worker worker --queues mit --loglevel=debug --concurrency=8

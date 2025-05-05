@@ -1,3 +1,17 @@
+# default: use dockerd's logging options, maybe json
+x-logging-default: &logging_options {}
+
+# example: fluentd logging (uncomment #&logging_options to enable)
+x-logging-fluentd: # &logging_options
+  driver: fluentd
+  options:
+    fluentd-address: "127.0.0.1:24224"
+    fluentd-async: "true"
+    tag: container-{{.Name}}-{{.ID}}
+
+# prefix other resource names (defaults to dir name)
+# name: moeflow-deploy
+
 services:
   moeflow-mongodb:
     image: ${DH_DOMAIN}/mongo:4.4.1
@@ -10,6 +24,7 @@ services:
     command: ['--quiet', '--setParameter', 'logLevel=0']
     networks:
       - default
+    logging: *logging_options
     healthcheck:
       # test: ["CMD","mongo", "--eval", "db.adminCommand('ping')"]
       test: ["CMD","bash", '-c', "exec 9<> /dev/tcp/127.0.0.1/27017"]
@@ -28,6 +43,7 @@ services:
       RABBITMQ_DEFAULT_VHOST: ${RABBITMQ_VHOST_NAME}
     networks:
       - default
+    logging: *logging_options
     healthcheck:
       test: rabbitmq-diagnostics -q ping
       interval: 5s
@@ -51,6 +67,7 @@ services:
     networks:
       - default
     restart: unless-stopped
+    logging: *logging_options
     depends_on:
       moeflow-backend-init:
         condition: service_completed_successfully
@@ -73,22 +90,6 @@ services:
     <<: *backend_base
     command: celery --app app.celery worker --queues output --hostname celery.output --loglevel=info
 
-  moeflow-celery-mit:
-    image: ${GHCR_DOMAIN}/${MOEFLOW_MIT_WORKER_IMAGE:-UNSET}:${MOEFLOW_MIT_WORKER_VERSION:-UNSET}
-    restart: unless-stopped
-    volumes:
-      - ./storage:/app/storage
-    env_file:
-      - '.env-mit-worker'
-    entrypoint: bash
-    command:
-      - -uexc
-      - |
-        exec conda run -n mit-py311 --no-capture-output celery --app moeflow_worker worker --queues mit --loglevel=debug --concurrency=8
-    links: [moeflow-rabbitmq, moeflow-mongodb]
-    profiles: [mit-worker]
-    depends_on: *backend-deps
-
   moeflow-frontend:
     image: ${GHCR_DOMAIN}/${MOEFLOW_FRONTEND_IMAGE}:${MOEFLOW_FRONTEND_VERSION}
     restart: unless-stopped
@@ -104,6 +105,7 @@ services:
       DOMAIN: ${DOMAIN}
       MAX_CONTENT_LENGTH_MB: ${MAX_CONTENT_LENGTH_MB}
     links: [moeflow-backend]
+    logging: *logging_options
     networks:
       - default
 
