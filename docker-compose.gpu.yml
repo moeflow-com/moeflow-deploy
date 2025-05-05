@@ -1,5 +1,19 @@
 services:
   moeflow-celery-mit:
+    image: ${GHCR_DOMAIN}/${MOEFLOW_MIT_WORKER_IMAGE:-UNSET}:${MOEFLOW_MIT_WORKER_VERSION:-UNSET}
+    restart: unless-stopped
+    volumes:
+      - ./storage:/app/storage
+    env_file:
+      - '.env-mit-worker'
+    entrypoint: bash
+    command:
+      - -uexc
+      - |
+        exec conda run -n mit-py311 --no-capture-output celery --app moeflow_worker worker --queues mit --loglevel=debug --concurrency=1
+    links: [moeflow-rabbitmq, moeflow-mongodb]
+    profiles: [mit-worker]
+    depends_on: *backend-deps
     deploy:
       resources:
         reservations:
