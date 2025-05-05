@@ -2,15 +2,15 @@
 x-logging-default: &logging_options {}
 
 # example: fluentd logging (uncomment #&logging_options to enable)
-x-logging-fluentd: &logging_options
+x-logging-fluentd: # &logging_options
   driver: fluentd
   options:
     fluentd-address: "127.0.0.1:24224"
     fluentd-async: "true"
     tag: container-{{.Name}}-{{.ID}}
 
-# prefix other resource names
-name: moeflow-deploy
+# prefix other resource names (defaults to dir name)
+# name: moeflow-deploy
 
 services:
   moeflow-mongodb:
