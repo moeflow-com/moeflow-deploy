@@ -105,6 +105,7 @@ services:
       DOMAIN: ${DOMAIN}
       MAX_CONTENT_LENGTH_MB: ${MAX_CONTENT_LENGTH_MB}
     links: [moeflow-backend]
+    logging: *logging_options
     networks:
       - default
 
