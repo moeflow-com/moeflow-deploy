@@ -22,8 +22,6 @@ services:
       MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USER}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASS}
     command: ['--quiet', '--setParameter', 'logLevel=0']
-    networks:
-      - default
     logging: *logging_options
     healthcheck:
       # test: ["CMD","mongo", "--eval", "db.adminCommand('ping')"]
@@ -41,8 +39,6 @@ services:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS}
       RABBITMQ_DEFAULT_VHOST: ${RABBITMQ_VHOST_NAME}
-    networks:
-      - default
     logging: *logging_options
     healthcheck:
       test: rabbitmq-diagnostics -q ping
@@ -64,8 +60,6 @@ services:
       MONGODB_URI: mongodb://${MONGODB_USER}:${MONGODB_PASS}@moeflow-mongodb:27017/moeflow?authSource=admin
       CELERY_BROKER_URL: amqp://${RABBITMQ_USER}:${RABBITMQ_PASS}@moeflow-rabbitmq:5672/${RABBITMQ_VHOST_NAME}
       MAX_CONTENT_LENGTH_MB: ${MAX_CONTENT_LENGTH_MB}
-    networks:
-      - default
     restart: unless-stopped
     logging: *logging_options
     depends_on:
@@ -106,9 +100,3 @@ services:
       MAX_CONTENT_LENGTH_MB: ${MAX_CONTENT_LENGTH_MB}
     links: [moeflow-backend]
     logging: *logging_options
-    networks:
-      - default
-
-networks: #FIXME: can we remove this?
-  default:
-    name: moeflow
